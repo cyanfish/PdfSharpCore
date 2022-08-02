@@ -306,10 +306,18 @@ namespace PdfSharpCore.Pdf.Internal
 
             Debug.Assert(!unicode || bytes.Length % 2 == 0, "Odd number of bytes in Unicode string.");
 
+            if (unicode && prefix)
+            {
+                var newBytes = new byte[bytes.Length + 2];
+                newBytes[0] = 0xFE;
+                newBytes[1] = 0xFF;
+                Array.Copy(bytes, 0, newBytes, 2, bytes.Length);
+                bytes = newBytes;
+            }
+
             bool encrypted = false;
             if (securityHandler != null)
             {
-                bytes = (byte[])bytes.Clone();
                 bytes = securityHandler.EncryptBytes(bytes);
                 encrypted = true;
             }
@@ -401,7 +409,7 @@ namespace PdfSharpCore.Pdf.Internal
             Hex:
                 if (hex)
                 {
-                    pdf.Append(prefix ? "<FEFF" : "<");
+                    pdf.Append("<");
                     for (int idx = 0; idx < count; idx += 2)
                     {
                         pdf.AppendFormat("{0:X2}{1:X2}", bytes[idx], bytes[idx + 1]);
