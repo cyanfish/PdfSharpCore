@@ -34,8 +34,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using MigraDocCore.DocumentObjectModel.Internals;
-using MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes;
-using static MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes.ImageSource;
+using PdfSharpCore.Drawing;
 
 namespace MigraDocCore.DocumentObjectModel.Shapes
 {

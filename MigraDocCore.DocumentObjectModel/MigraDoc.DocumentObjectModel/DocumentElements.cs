@@ -35,9 +35,8 @@ using MigraDocCore.DocumentObjectModel.Visitors;
 using MigraDocCore.DocumentObjectModel.Tables;
 using MigraDocCore.DocumentObjectModel.Shapes.Charts;
 using MigraDocCore.DocumentObjectModel.Shapes;
+using PdfSharpCore.Drawing;
 using MigraDocImage = MigraDocCore.DocumentObjectModel.Shapes.Image;
-using MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes;
-using static MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes.ImageSource;
 
 namespace MigraDocCore.DocumentObjectModel
 {

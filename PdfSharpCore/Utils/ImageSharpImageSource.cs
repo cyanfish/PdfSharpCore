@@ -1,6 +1,6 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes;
+using PdfSharpCore.Drawing;
 using System;
 using System.IO;
 using SixLabors.ImageSharp.Formats;

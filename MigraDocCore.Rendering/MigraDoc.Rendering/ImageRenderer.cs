@@ -36,7 +36,6 @@ using PdfSharpCore.Drawing;
 using MigraDocCore.DocumentObjectModel.Shapes;
 using MigraDocCore.Rendering.MigraDoc.Rendering.Resources;
 using PdfSharpCore.Fonts;
-using static MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes.ImageSource;
 
 namespace MigraDocCore.Rendering
 {

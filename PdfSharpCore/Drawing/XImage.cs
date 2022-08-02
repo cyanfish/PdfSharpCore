@@ -32,9 +32,7 @@ using System.Diagnostics;
 using System.IO;
 using PdfSharpCore.Pdf.IO;
 using PdfSharpCore.Pdf.Advanced;
-using MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes;
 using PdfSharpCore.Pdf.IO.enums;
-using static MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes.ImageSource;
 using PdfSharpCore.Utils;
 using SixLabors.ImageSharp.PixelFormats;
 

@@ -43,7 +43,7 @@ using MigraDocCore.DocumentObjectModel.Shapes;
 using MigraDocCore.DocumentObjectModel.Shapes.Charts;
 using MigraDocCore.DocumentObjectModel.Fields;
 using MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Resources;
-using MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes;
+using PdfSharpCore.Drawing;
 
 namespace MigraDocCore.DocumentObjectModel.IO
 {
@@ -74,7 +74,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\document».
+        /// Parses the keyword ï¿½\documentï¿½.
         /// </summary>
         internal Document ParseDocument(Document document)
         {
@@ -106,8 +106,8 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses one of the keywords «\document», «\styles», «\section», «\table», «\textframe», «\chart»
-        /// and «\paragraph» and returns the corresponding DocumentObject or DocumentObjectCollection.
+        /// Parses one of the keywords ï¿½\documentï¿½, ï¿½\stylesï¿½, ï¿½\sectionï¿½, ï¿½\tableï¿½, ï¿½\textframeï¿½, ï¿½\chartï¿½
+        /// and ï¿½\paragraphï¿½ and returns the corresponding DocumentObject or DocumentObjectCollection.
         /// </summary>
         internal DocumentObject ParseDocumentObject()
         {
@@ -158,7 +158,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\styles».
+        /// Parses the keyword ï¿½\stylesï¿½.
         /// </summary>
         private Styles ParseStyles(Styles styles)
         {
@@ -180,7 +180,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses a style definition block within the keyword «\styles».
+        /// Parses a style definition block within the keyword ï¿½\stylesï¿½.
         /// </summary>
         private Style ParseStyleDefinition(Styles styles)
         {
@@ -264,7 +264,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\section».
+        /// Parses the keyword ï¿½\sectionï¿½.
         /// </summary>
         private Section ParseSection(Sections sections)
         {
@@ -284,7 +284,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
 
                 AssertSymbol(Symbol.BraceLeft);
 
-                // Consider the case that the keyword «\paragraph» can be omitted.
+                // Consider the case that the keyword ï¿½\paragraphï¿½ can be omitted.
                 if (IsParagraphContent())
                 {
                     Paragraph paragraph = section.Elements.AddParagraph();
@@ -313,7 +313,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keywords «\header».
+        /// Parses the keywords ï¿½\headerï¿½.
         /// </summary>
         private void ParseHeaderFooter(Section section)
         {
@@ -423,7 +423,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the document elements of a «\paragraph», «\cell» or comparable.
+        /// Parses the document elements of a ï¿½\paragraphï¿½, ï¿½\cellï¿½ or comparable.
         /// </summary>
         private DocumentElements ParseDocumentElements(DocumentElements elements, Symbol context)
         {
@@ -482,7 +482,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\paragraph».
+        /// Parses the keyword ï¿½\paragraphï¿½.
         /// </summary>
         private void ParseParagraph(DocumentElements elements)
         {
@@ -675,7 +675,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keywords «\bold», «\italic», and «\underline».
+        /// Parses the keywords ï¿½\boldï¿½, ï¿½\italicï¿½, and ï¿½\underlineï¿½.
         /// </summary>
         private void ParseBoldItalicEtc(FormattedText formattedText, int nestingLevel)
         {
@@ -686,7 +686,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\font».
+        /// Parses the keyword ï¿½\fontï¿½.
         /// </summary>
         private void ParseFont(FormattedText formattedText, int nestingLevel)
         {
@@ -708,7 +708,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses code like «("name")».
+        /// Parses code like ï¿½("name")ï¿½.
         /// </summary>
         private string ParseElementName()
         {
@@ -725,7 +725,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\fontsize».
+        /// Parses the keyword ï¿½\fontsizeï¿½.
         /// </summary>
         private void ParseFontSize(FormattedText formattedText, int nestingLevel)
         {
@@ -746,7 +746,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\fontcolor».
+        /// Parses the keyword ï¿½\fontcolorï¿½.
         /// </summary>
         private void ParseFontColor(FormattedText formattedText, int nestingLevel)
         {
@@ -765,7 +765,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\symbol» resp. «\(».
+        /// Parses the keyword ï¿½\symbolï¿½ resp. ï¿½\(ï¿½.
         /// </summary>
         private void ParseSymbol(ParagraphElements elements)
         {
@@ -818,7 +818,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\chr».
+        /// Parses the keyword ï¿½\chrï¿½.
         /// </summary>
         private void ParseChr(ParagraphElements elements)
         {
@@ -864,7 +864,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\field».
+        /// Parses the keyword ï¿½\fieldï¿½.
         /// </summary>
         private void ParseField(ParagraphElements elements, int nestingLevel)
         {
@@ -925,7 +925,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\footnote».
+        /// Parses the keyword ï¿½\footnoteï¿½.
         /// </summary>
         private void ParseFootnote(ParagraphElements elements, int nestingLevel)
         {
@@ -938,7 +938,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
 
             AssertSymbol(Symbol.BraceLeft);
 
-            // The keyword «\paragraph» is typically ommitted.
+            // The keyword ï¿½\paragraphï¿½ is typically ommitted.
             if (IsParagraphContent())
             {
                 Paragraph paragraph = footnote.Elements.AddParagraph();
@@ -953,7 +953,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\hyperlink».
+        /// Parses the keyword ï¿½\hyperlinkï¿½.
         /// </summary>
         private void ParseHyperlink(ParagraphElements elements, int nestingLevel)
         {
@@ -971,7 +971,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\space».
+        /// Parses the keyword ï¿½\spaceï¿½.
         /// </summary>
         private void ParseSpace(ParagraphElements elements, int nestingLevel)
         {
@@ -984,7 +984,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
 
             Character space = elements.AddSpace(1);
 
-            // «\space» can stand alone
+            // ï¿½\spaceï¿½ can stand alone
             if (scanner.PeekSymbol() == Symbol.ParenLeft)
             {
                 ReadCode(); // read '('
@@ -1028,7 +1028,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\table».
+        /// Parses the keyword ï¿½\tableï¿½.
         /// </summary>
         private void ParseTable(DocumentElements elements, Table table)
         {
@@ -1048,11 +1048,11 @@ namespace MigraDocCore.DocumentObjectModel.IO
                 AssertSymbol(Symbol.BraceLeft);
                 ReadCode();
 
-                // Table must start with «\columns»...
+                // Table must start with ï¿½\columnsï¿½...
                 AssertSymbol(Symbol.Columns);
                 ParseColumns(tbl);
 
-                // ...followed by «\rows».
+                // ...followed by ï¿½\rowsï¿½.
                 AssertSymbol(Symbol.Rows);
                 ParseRows(tbl);
 
@@ -1067,7 +1067,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\columns».
+        /// Parses the keyword ï¿½\columnsï¿½.
         /// </summary>
         private void ParseColumns(Table table)
         {
@@ -1107,7 +1107,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\column».
+        /// Parses the keyword ï¿½\columnï¿½.
         /// </summary>
         private void ParseColumn(Column column)
         {
@@ -1128,7 +1128,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\rows».
+        /// Parses the keyword ï¿½\rowsï¿½.
         /// </summary>
         private void ParseRows(Table table)
         {
@@ -1168,7 +1168,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\row».
+        /// Parses the keyword ï¿½\rowï¿½.
         /// </summary>
         private void ParseRow(Row row)
         {
@@ -1213,7 +1213,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\cell».
+        /// Parses the keyword ï¿½\cellï¿½.
         /// </summary>
         private void ParseCell(Cell cell)
         {
@@ -1243,7 +1243,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\image».
+        /// Parses the keyword ï¿½\imageï¿½.
         /// </summary>
         private void ParseImage(Image image, bool paragraphContent)
         {
@@ -1279,7 +1279,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\textframe».
+        /// Parses the keyword ï¿½\textframeï¿½.
         /// </summary>
         private void ParseTextFrame(DocumentElements elements)
         {
@@ -1353,7 +1353,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\chart».
+        /// Parses the keyword ï¿½\chartï¿½.
         /// </summary>
         private void ParseChart(DocumentElements elements)
         {
@@ -1472,7 +1472,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\plotarea» inside a chart.
+        /// Parses the keyword ï¿½\plotareaï¿½ inside a chart.
         /// </summary>
         private void ParseArea(PlotArea area)
         {
@@ -1518,8 +1518,8 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keywords «\headerarea», «\toparea», «\bottomarea», «\footerarea»,
-        /// «\leftarea» or «\rightarea» inside a chart.
+        /// Parses the keywords ï¿½\headerareaï¿½, ï¿½\topareaï¿½, ï¿½\bottomareaï¿½, ï¿½\footerareaï¿½,
+        /// ï¿½\leftareaï¿½ or ï¿½\rightareaï¿½ inside a chart.
         /// </summary>
         private void ParseArea(TextArea area)
         {
@@ -1594,7 +1594,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keywords «\xaxis», «\yaxis» or «\zaxis» inside a chart.
+        /// Parses the keywords ï¿½\xaxisï¿½, ï¿½\yaxisï¿½ or ï¿½\zaxisï¿½ inside a chart.
         /// </summary>
         private void ParseAxes(Axis axis, Symbol symbolAxis)
         {
@@ -1630,7 +1630,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\series» inside a chart.
+        /// Parses the keyword ï¿½\seriesï¿½ inside a chart.
         /// </summary>
         private void ParseSeries(Series series)
         {
@@ -1698,7 +1698,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\xvalues» inside a chart.
+        /// Parses the keyword ï¿½\xvaluesï¿½ inside a chart.
         /// </summary>
         private void ParseSeries(XSeries series)
         {
@@ -1760,7 +1760,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\point» inside a series.
+        /// Parses the keyword ï¿½\pointï¿½ inside a series.
         /// </summary>
         private void ParsePoint(Point point)
         {
@@ -1790,7 +1790,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses the keyword «\legend» inside a textarea.
+        /// Parses the keyword ï¿½\legendï¿½ inside a textarea.
         /// </summary>
         private void ParseLegend(Legend legend)
         {
@@ -1822,7 +1822,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses an attribute declaration block enclosed in brackets «[…]». If readNextSymbol is
+        /// Parses an attribute declaration block enclosed in brackets ï¿½[ï¿½]ï¿½. If readNextSymbol is
         /// set to true, the closing bracket will be read.
         /// </summary>
         private void ParseAttributes(DocumentObject element, bool readNextSymbol)
@@ -1841,7 +1841,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses an attribute declaration block enclosed in brackets «[…]».
+        /// Parses an attribute declaration block enclosed in brackets ï¿½[ï¿½]ï¿½.
         /// </summary>
         private void ParseAttributes(DocumentObject element)
         {
@@ -1858,7 +1858,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
             // or 
             //   sequence of identifiers: xxx.yyy.zzz
             //
-            // followed by: «=», «+=», «-=», or «{»
+            // followed by: ï¿½=ï¿½, ï¿½+=ï¿½, ï¿½-=ï¿½, or ï¿½{ï¿½
             //
             // Parser of rhs depends on the type of the l-value.
 
@@ -1979,7 +1979,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses an attribute declaration block enclosed in braces «{…}».
+        /// Parses an attribute declaration block enclosed in braces ï¿½{ï¿½}ï¿½.
         /// </summary>
         private void ParseAttributeBlock(DocumentObject element)
         {
@@ -2221,8 +2221,8 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses a color. It can be «green», «123456», «0xFFABCDEF», 
-        /// «RGB(r, g, b)», «CMYK(c, m, y, k)», «CMYK(a, c, m, y, k)», «GRAY(g)», or «"MyColor"».
+        /// Parses a color. It can be ï¿½greenï¿½, ï¿½123456ï¿½, ï¿½0xFFABCDEFï¿½, 
+        /// ï¿½RGB(r, g, b)ï¿½, ï¿½CMYK(c, m, y, k)ï¿½, ï¿½CMYK(a, c, m, y, k)ï¿½, ï¿½GRAY(g)ï¿½, or ï¿½"MyColor"ï¿½.
         /// </summary>
         private Color ParseColor()
         {
@@ -2278,7 +2278,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses «RGB(r, g, b)».
+        /// Parses ï¿½RGB(r, g, b)ï¿½.
         /// </summary>
         private Color ParseRGB()
         {
@@ -2319,7 +2319,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses «CMYK(c, m, y, k)» or «CMYK(a, c, m, y, k)».
+        /// Parses ï¿½CMYK(c, m, y, k)ï¿½ or ï¿½CMYK(a, c, m, y, k)ï¿½.
         /// </summary>
         private Color ParseCMYK()
         {
@@ -2390,7 +2390,7 @@ namespace MigraDocCore.DocumentObjectModel.IO
         }
 
         /// <summary>
-        /// Parses «GRAY(g)».
+        /// Parses ï¿½GRAY(g)ï¿½.
         /// </summary>
         private Color ParseGray()
         {
