@@ -404,7 +404,7 @@ namespace PdfSharpCore.Pdf.IO
 
             if (omitStream)
             {
-                WriteRaw("  «...stream content omitted...»\n");  // useful for debugging only
+                WriteRaw("  ï¿½...stream content omitted...ï¿½\n");  // useful for debugging only
             }
             else
             {
@@ -417,8 +417,7 @@ namespace PdfSharpCore.Pdf.IO
                         bytes = _securityHandler.EncryptBytes(bytes);
                     }
                     Write(bytes);
-                    if (_lastCat != CharCat.NewLine)
-                        WriteRaw('\n');
+                    WriteRaw('\n');
                 }
             }
             WriteRaw("endstream\n");
