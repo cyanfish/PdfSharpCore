@@ -48,14 +48,14 @@ namespace PdfSharpCore.Utils
             public int Width => Image.Width;
             public int Height => Image.Height;
             public string Name { get; }
-            public bool Transparent { get; internal set; }
+            public XImageFormat ImageFormat { get; }
 
-            public ImageSharpImageSourceImpl(string name, Image<TPixel2> image, int quality, bool isTransparent)
+            public ImageSharpImageSourceImpl(string name, Image<TPixel2> image, int quality, bool isPng)
             {
                 Name = name;
                 Image = image;
                 _quality = quality;
-                Transparent = isTransparent;
+                ImageFormat = isPng ? XImageFormat.Argb32 : XImageFormat.Jpeg;
             }
 
             public void SaveAsJpeg(MemoryStream ms)
@@ -67,10 +67,16 @@ namespace PdfSharpCore.Utils
             {
                 Image.Dispose();
             }
+
             public void SaveAsPdfBitmap(MemoryStream ms)
             {
                 BmpEncoder bmp = new BmpEncoder { BitsPerPixel = BmpBitsPerPixel.Pixel32 };
                 Image.Save(ms, bmp);
+            }
+
+            public void SaveAsPdfIndexedBitmap(MemoryStream ms)
+            {
+                throw new NotImplementedException();
             }
         }
     }

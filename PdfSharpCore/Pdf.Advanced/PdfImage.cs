@@ -2,7 +2,7 @@
 //
 // Authors:
 //   Stefan Lange
-//   Thomas Hövel
+//   Thomas Hï¿½vel
 //
 // Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
 //
@@ -56,25 +56,24 @@ namespace PdfSharpCore.Pdf.Advanced
             ////// TODO: identify multiple used images. If the image already exists use the same XRef.
             ////_defaultName = PdfImageTable.NextImageName;
 
-            switch (_image.Format.Guid.ToString("B").ToUpper())
+            switch (_image.Format)
             {
                 // Pdf supports Jpeg, therefore we can write what we've read:
-                case "{B96B3CAE-0728-11D3-9D7B-0000F81EF32E}":  //XImageFormat.Jpeg
+                case XImageFormat.Jpeg:
                     InitializeJpeg();
                     break;
 
                 // All other image formats are converted to PDF bitmaps:
-                case "{B96B3CAF-0728-11D3-9D7B-0000F81EF32E}":  //XImageFormat.Png
-                case "{B96B3CB0-0728-11D3-9D7B-0000F81EF32E}":  //XImageFormat.Gif
-                case "{B96B3CB1-0728-11D3-9D7B-0000F81EF32E}":  //XImageFormat.Tiff
-                case "{B96B3CB5-0728-11D3-9D7B-0000F81EF32E}":  //XImageFormat.Icon
-                    // TODO: possible optimization for PNG (do not decompress/recompress)???
-                    // TODO: try Jpeg for size optimization???
-                    InitializeNonJpeg();
+                case XImageFormat.Argb32:
+                    InitializePng(true);
                     break;
 
-                case "{84570158-DBF0-4C6B-8368-62D6A3CA76E0}":  //XImageFormat.Pdf:
-                    Debug.Assert(false, "XPdfForm not expected here.");
+                case XImageFormat.Rgb24:
+                    InitializePng(false);
+                    break;
+
+                case XImageFormat.Indexed:
+                    InitializeIndexed();
                     break;
 
                 default:
@@ -144,9 +143,17 @@ namespace PdfSharpCore.Pdf.Advanced
         /// <summary>
         /// Creates the keys for a FLATE image.
         /// </summary>
-        void InitializeNonJpeg()
+        void InitializePng(bool hasAlpha)
         {
-            ReadTrueColorMemoryBitmap(3, 8, true);
+            ReadTrueColorMemoryBitmap(3, 8, hasAlpha);
+        }
+
+        /// <summary>
+        /// Creates the keys for a CCITT4 image.
+        /// </summary>
+        void InitializeIndexed()
+        {
+            ReadIndexedMemoryBitmap(1);
         }
 
         private static int ReadWord(byte[] ab, int offset)
@@ -168,14 +175,15 @@ namespace PdfSharpCore.Pdf.Advanced
         private void ReadTrueColorMemoryBitmap(int components, int bits, bool hasAlpha)
         {
             int pdfVersion = Owner.Version;
-            MemoryStream memory = new MemoryStream();
-            memory = _image.AsBitmap();
+            MemoryStream memory = _image.AsBitmap();
             // THHO4THHO Use ImageImporterBMP here to avoid redundant code.
 
             int streamLength = (int)memory.Length;
             Debug.Assert(streamLength > 0, "Bitmap image encoding failed.");
             if (streamLength > 0)
             {
+                // TODO: We can access the buffer directly here. Or more to the point, we can massively strip down this
+                // TODO: method so that we give it the uncompressed stream directly, no pixel iteration here.
                 byte[] imageBits = new byte[streamLength];
                 memory.Seek(0, SeekOrigin.Begin);
                 memory.Read(imageBits, 0, streamLength);
@@ -184,35 +192,7 @@ namespace PdfSharpCore.Pdf.Advanced
                 int height = _image.PixelHeight;
                 int width = _image.PixelWidth;
 
-                // TODO: we could define structures for
-                //   BITMAPFILEHEADER
-                //   { BITMAPINFO }
-                //   BITMAPINFOHEADER
-                // to avoid ReadWord and ReadDWord ... (but w/o pointers this doesn't help much)
-
-                bool bigHeader = false;
-                if (ReadWord(imageBits, 0) != 0x4d42 || // "BM"
-                    ReadDWord(imageBits, 2) != streamLength ||
-                    ReadDWord(imageBits, 18) != width ||
-                    ReadDWord(imageBits, 22) != height)
-                {
-                    throw new NotImplementedException("ReadTrueColorMemoryBitmap: unsupported format");
-                }
-                int infoHeaderSize = ReadDWord(imageBits, 14); // sizeof BITMAPINFOHEADER
-                if (infoHeaderSize != 40 && infoHeaderSize != 108)
-                {
-                    throw new NotImplementedException("ReadTrueColorMemoryBitmap: unsupported format #2");
-                }
-                bigHeader = infoHeaderSize == 108;
-                if (ReadWord(imageBits, 26) != 1 ||
-                  (!hasAlpha && ReadWord(imageBits, bigHeader?30:28) != components * bits ||
-                   hasAlpha && ReadWord(imageBits, bigHeader?30:28) != (components + 1) * bits) ||
-                  bigHeader ? ReadWord(imageBits, 32) != 0 : ReadDWord(imageBits, 30) != 0)
-                {
-                    throw new NotImplementedException("ReadTrueColorMemoryBitmap: unsupported format #3");
-                }
-
-                int nFileOffset = ReadDWord(imageBits, 10);
+                int nFileOffset = 0;
                 int logicalComponents = components;
                 if (components == 4)
                     logicalComponents = 3;
@@ -324,29 +304,13 @@ namespace PdfSharpCore.Pdf.Advanced
             }
         }
 
-        /* BITMAPINFOHEADER struct and byte offsets:
-            typedef struct tagBITMAPINFOHEADER{
-              DWORD  biSize;           // 14
-              LONG   biWidth;          // 18
-              LONG   biHeight;         // 22
-              WORD   biPlanes;         // 26
-              WORD   biBitCount;       // 28
-              DWORD  biCompression;    // 30
-              DWORD  biSizeImage;      // 34
-              LONG   biXPelsPerMeter;  // 38
-              LONG   biYPelsPerMeter;  // 42
-              DWORD  biClrUsed;        // 46
-              DWORD  biClrImportant;   // 50
-            } BITMAPINFOHEADER, *PBITMAPINFOHEADER; 
-        */
-
         private void ReadIndexedMemoryBitmap(int bits/*, ref bool hasAlpha*/)
         {
             int pdfVersion = Owner.Version;
             int firstMaskColor = -1, lastMaskColor = -1;
             bool segmentedColorMask = false;
 
-            MemoryStream memory = new MemoryStream();
+            MemoryStream memory = _image.AsIndexedBitmap();
             // THHO4THHO Use ImageImporterBMP here to avoid redundant code.
 
             int streamLength = (int)memory.Length;
@@ -361,88 +325,61 @@ namespace PdfSharpCore.Pdf.Advanced
                 int height = _image.PixelHeight;
                 int width = _image.PixelWidth;
 
-                if (ReadWord(imageBits, 0) != 0x4d42 || // "BM"
-                  ReadDWord(imageBits, 2) != streamLength ||
-                  ReadDWord(imageBits, 14) != 40 || // sizeof BITMAPINFOHEADER
-                  ReadDWord(imageBits, 18) != width ||
-                  ReadDWord(imageBits, 22) != height)
-                {
-                    throw new NotImplementedException("ReadIndexedMemoryBitmap: unsupported format");
-                }
-                int fileBits = ReadWord(imageBits, 28);
-                if (fileBits != bits)
-                {
-                    if (fileBits == 1 || fileBits == 4 || fileBits == 8)
-                        bits = fileBits;
-                }
-
-                if (ReadWord(imageBits, 26) != 1 ||
-                    ReadWord(imageBits, 28) != bits ||
-                    ReadDWord(imageBits, 30) != 0)
-                {
-                    throw new NotImplementedException("ReadIndexedMemoryBitmap: unsupported format #2");
-                }
-
-                int bytesFileOffset = ReadDWord(imageBits, 10);
-                const int bytesColorPaletteOffset = 0x36; // GDI+ always returns Windows bitmaps: sizeof BITMAPFILEHEADER + sizeof BITMAPINFOHEADER
-                int paletteColors = ReadDWord(imageBits, 46);
-                if ((bytesFileOffset - bytesColorPaletteOffset) / 4 != paletteColors)
-                {
-                    throw new NotImplementedException("ReadIndexedMemoryBitmap: unsupported format #3");
-                }
-
                 MonochromeMask mask = new MonochromeMask(width, height);
+                //
+                // bool isGray = bits == 8 && (paletteColors == 256 || paletteColors == 0);
+                // int isBitonal = 0; // 0: false; >0: true; <0: true (inverted)
+                // byte[] paletteData = new byte[3 * paletteColors];
+                // for (int color = 0; color < paletteColors; ++color)
+                // {
+                //     paletteData[3 * color] = imageBits[bytesColorPaletteOffset + 4 * color + 2];
+                //     paletteData[3 * color + 1] = imageBits[bytesColorPaletteOffset + 4 * color + 1];
+                //     paletteData[3 * color + 2] = imageBits[bytesColorPaletteOffset + 4 * color + 0];
+                //     if (isGray)
+                //         isGray = paletteData[3 * color] == paletteData[3 * color + 1] &&
+                //           paletteData[3 * color] == paletteData[3 * color + 2];
+                //
+                //     if (imageBits[bytesColorPaletteOffset + 4 * color + 3] < 128)
+                //     {
+                //         // We treat this as transparency:
+                //         if (firstMaskColor == -1)
+                //             firstMaskColor = color;
+                //         if (lastMaskColor == -1 || lastMaskColor == color - 1)
+                //             lastMaskColor = color;
+                //         if (lastMaskColor != color)
+                //             segmentedColorMask = true;
+                //     }
+                //     //else
+                //     //{
+                //     //  // We treat this as opacity:
+                //     //}
+                // }
 
-                bool isGray = bits == 8 && (paletteColors == 256 || paletteColors == 0);
-                int isBitonal = 0; // 0: false; >0: true; <0: true (inverted)
-                byte[] paletteData = new byte[3 * paletteColors];
-                for (int color = 0; color < paletteColors; ++color)
-                {
-                    paletteData[3 * color] = imageBits[bytesColorPaletteOffset + 4 * color + 2];
-                    paletteData[3 * color + 1] = imageBits[bytesColorPaletteOffset + 4 * color + 1];
-                    paletteData[3 * color + 2] = imageBits[bytesColorPaletteOffset + 4 * color + 0];
-                    if (isGray)
-                        isGray = paletteData[3 * color] == paletteData[3 * color + 1] &&
-                          paletteData[3 * color] == paletteData[3 * color + 2];
+                // if (bits == 1)
+                // {
+                //     if (paletteColors == 0)
+                //         isBitonal = 1;
+                //     if (paletteColors == 2)
+                //     {
+                //         if (paletteData[0] == 0 &&
+                //           paletteData[1] == 0 &&
+                //           paletteData[2] == 0 &&
+                //           paletteData[3] == 255 &&
+                //           paletteData[4] == 255 &&
+                //           paletteData[5] == 255)
+                //             isBitonal = 1; // Black on white
+                //         if (paletteData[5] == 0 &&
+                //           paletteData[4] == 0 &&
+                //           paletteData[3] == 0 &&
+                //           paletteData[2] == 255 &&
+                //           paletteData[1] == 255 &&
+                //           paletteData[0] == 255)
+                //             isBitonal = -1; // White on black
+                //     }
+                // }
 
-                    if (imageBits[bytesColorPaletteOffset + 4 * color + 3] < 128)
-                    {
-                        // We treat this as transparency:
-                        if (firstMaskColor == -1)
-                            firstMaskColor = color;
-                        if (lastMaskColor == -1 || lastMaskColor == color - 1)
-                            lastMaskColor = color;
-                        if (lastMaskColor != color)
-                            segmentedColorMask = true;
-                    }
-                    //else
-                    //{
-                    //  // We treat this as opacity:
-                    //}
-                }
-
-                if (bits == 1)
-                {
-                    if (paletteColors == 0)
-                        isBitonal = 1;
-                    if (paletteColors == 2)
-                    {
-                        if (paletteData[0] == 0 &&
-                          paletteData[1] == 0 &&
-                          paletteData[2] == 0 &&
-                          paletteData[3] == 255 &&
-                          paletteData[4] == 255 &&
-                          paletteData[5] == 255)
-                            isBitonal = 1; // Black on white
-                        if (paletteData[5] == 0 &&
-                          paletteData[4] == 0 &&
-                          paletteData[3] == 0 &&
-                          paletteData[2] == 255 &&
-                          paletteData[1] == 255 &&
-                          paletteData[0] == 255)
-                            isBitonal = -1; // White on black
-                    }
-                }
+                int isBitonal = 1;
+                int bytesFileOffset = 0;
 
                 // NYI: (no sample found where this was required) 
                 // if (segmentedColorMask = true)
@@ -504,16 +441,16 @@ namespace PdfSharpCore.Pdf.Advanced
                             int bytesOffsetWrite = (height - 1 - y) * ((width * bits + 7) / 8);
                             for (int x = 0; x < bytesPerLine; ++x)
                             {
-                                if (isGray)
-                                {
-                                    // Lookup the gray value from the palette:
-                                    imageData[bytesOffsetWrite] = paletteData[3 * imageBits[bytesFileOffset + bytesOffsetRead]];
-                                }
-                                else
-                                {
-                                    // Store the palette index.
-                                    imageData[bytesOffsetWrite] = imageBits[bytesFileOffset + bytesOffsetRead];
-                                }
+                                // if (isGray)
+                                // {
+                                //     // Lookup the gray value from the palette:
+                                //     imageData[bytesOffsetWrite] = paletteData[3 * imageBits[bytesFileOffset + bytesOffsetRead]];
+                                // }
+                                // else
+                                // {
+                                // Store the palette index.
+                                imageData[bytesOffsetWrite] = imageBits[bytesFileOffset + bytesOffsetRead];
+                                // }
                                 if (firstMaskColor != -1)
                                 {
                                     int n = imageBits[bytesFileOffset + bytesOffsetRead];
@@ -544,7 +481,6 @@ namespace PdfSharpCore.Pdf.Advanced
                                 bytesOffsetRead += 1;
                                 bytesOffsetWrite += 1;
                             }
-                            bytesOffsetRead = 4 * ((bytesOffsetRead + 3) / 4); // Align to 32 bit boundary
                         }
                     }
                     else
@@ -559,7 +495,7 @@ namespace PdfSharpCore.Pdf.Advanced
                 {
                     // Color mask requires Reader 4.0 or higher:
                     //if (!segmentedColorMask && pdfVersion >= 13)
-                    if (!segmentedColorMask && pdfVersion >= 13 && !isGray)
+                    if (!segmentedColorMask && pdfVersion >= 13)// && !isGray)
                     {
                         PdfArray array = new PdfArray(_document);
                         array.Elements.Add(new PdfInteger(firstMaskColor));
@@ -656,38 +592,38 @@ namespace PdfSharpCore.Pdf.Advanced
 
                 // CCITT encoding: we need color palette for isBitonal == 0
                 // FlateDecode: we need color palette for isBitonal <= 0 unless we have grayscales
-                if ((usesCcittEncoding && isBitonal == 0) ||
-                  (!usesCcittEncoding && isBitonal <= 0 && !isGray))
-                {
-                    PdfDictionary colorPalette = null;
-                    colorPalette = new PdfDictionary(_document);
-                    byte[] packedPaletteData = paletteData.Length >= 48 ? fd.Encode(paletteData, _document.Options.FlateEncodeMode) : null; // don't compress small palettes
-                    if (packedPaletteData != null && packedPaletteData.Length + 20 < paletteData.Length) // +20: compensate for the overhead (estimated value)
-                    {
-                        // Create compressed color palette:
-                        colorPalette.CreateStream(packedPaletteData);
-                        colorPalette.Elements[PdfStream.Keys.Length] = new PdfInteger(packedPaletteData.Length);
-                        colorPalette.Elements[PdfStream.Keys.Filter] = new PdfName("/FlateDecode");
-                    }
-                    else
-                    {
-                        // Create uncompressed color palette:
-                        colorPalette.CreateStream(paletteData);
-                        colorPalette.Elements[PdfStream.Keys.Length] = new PdfInteger(paletteData.Length);
-                    }
-                    Owner._irefTable.Add(colorPalette);
-
-                    PdfArray arrayColorSpace = new PdfArray(_document);
-                    arrayColorSpace.Elements.Add(new PdfName("/Indexed"));
-                    arrayColorSpace.Elements.Add(new PdfName("/DeviceRGB"));
-                    arrayColorSpace.Elements.Add(new PdfInteger(paletteColors - 1));
-                    arrayColorSpace.Elements.Add(colorPalette.Reference);
-                    Elements[Keys.ColorSpace] = arrayColorSpace;
-                }
-                else
-                {
+                // if ((usesCcittEncoding && isBitonal == 0) ||
+                //   (!usesCcittEncoding && isBitonal <= 0))// && !isGray))
+                // {
+                //     PdfDictionary colorPalette = null;
+                //     colorPalette = new PdfDictionary(_document);
+                //     byte[] packedPaletteData = paletteData.Length >= 48 ? fd.Encode(paletteData, _document.Options.FlateEncodeMode) : null; // don't compress small palettes
+                //     if (packedPaletteData != null && packedPaletteData.Length + 20 < paletteData.Length) // +20: compensate for the overhead (estimated value)
+                //     {
+                //         // Create compressed color palette:
+                //         colorPalette.CreateStream(packedPaletteData);
+                //         colorPalette.Elements[PdfStream.Keys.Length] = new PdfInteger(packedPaletteData.Length);
+                //         colorPalette.Elements[PdfStream.Keys.Filter] = new PdfName("/FlateDecode");
+                //     }
+                //     else
+                //     {
+                //         // Create uncompressed color palette:
+                //         colorPalette.CreateStream(paletteData);
+                //         colorPalette.Elements[PdfStream.Keys.Length] = new PdfInteger(paletteData.Length);
+                //     }
+                //     Owner._irefTable.Add(colorPalette);
+                //
+                //     PdfArray arrayColorSpace = new PdfArray(_document);
+                //     arrayColorSpace.Elements.Add(new PdfName("/Indexed"));
+                //     arrayColorSpace.Elements.Add(new PdfName("/DeviceRGB"));
+                //     arrayColorSpace.Elements.Add(new PdfInteger(paletteColors - 1));
+                //     arrayColorSpace.Elements.Add(colorPalette.Reference);
+                //     Elements[Keys.ColorSpace] = arrayColorSpace;
+                // }
+                // else
+                // {
                     Elements[Keys.ColorSpace] = new PdfName("/DeviceGray");
-                }
+                // }
                 if (_image.Interpolate)
                     Elements[Keys.Interpolate] = PdfBoolean.True;
             }
@@ -730,8 +666,8 @@ namespace PdfSharpCore.Pdf.Advanced
             /// (Required for images, except those that use the JPXDecode filter; not allowed for image masks)
             /// The color space in which image samples are specified; it can be any type of color space except
             /// Pattern. If the image uses the JPXDecode filter, this entry is optional:
-            /// • If ColorSpace is present, any color space specifications in the JPEG2000 data are ignored.
-            /// • If ColorSpace is absent, the color space specifications in the JPEG2000 data are used.
+            /// ï¿½ If ColorSpace is present, any color space specifications in the JPEG2000 data are ignored.
+            /// ï¿½ If ColorSpace is absent, the color space specifications in the JPEG2000 data are used.
             ///   The Decode array is also ignored unless ImageMask is true.
             /// </summary>
             [KeyInfo(KeyType.NameOrArray | KeyType.Required)]
@@ -781,10 +717,10 @@ namespace PdfSharpCore.Pdf.Advanced
 
             /// <summary>
             /// (Optional) An array of numbers describing how to map image samples into the range of values
-            /// appropriate for the image’s color space. If ImageMask is true, the array must be either
+            /// appropriate for the imageï¿½s color space. If ImageMask is true, the array must be either
             /// [0 1] or [1 0]; otherwise, its length must be twice the number of color components required 
             /// by ColorSpace. If the image uses the JPXDecode filter and ImageMask is false, Decode is ignored.
-            /// Default value: see “Decode Arrays”.
+            /// Default value: see ï¿½Decode Arraysï¿½.
             /// </summary>
             [KeyInfo(KeyType.Array | KeyType.Optional)]
             public const string Decode = "/Decode";
@@ -809,8 +745,8 @@ namespace PdfSharpCore.Pdf.Advanced
             /// source of mask shape or mask opacity values in the transparent imaging model. The alpha 
             /// source parameter in the graphics state determines whether the mask values are interpreted as
             /// shape or opacity. If present, this entry overrides the current soft mask in the graphics state,
-            /// as well as the image’s Mask entry, if any. (However, the other transparency related graphics 
-            /// state parameters — blend mode and alpha constant — remain in effect.) If SMask is absent, the 
+            /// as well as the imageï¿½s Mask entry, if any. (However, the other transparency related graphics 
+            /// state parameters ï¿½ blend mode and alpha constant ï¿½ remain in effect.) If SMask is absent, the 
             /// image has no associated soft mask (although the current soft mask in the graphics state may
             /// still apply).
             /// </summary>
@@ -821,10 +757,10 @@ namespace PdfSharpCore.Pdf.Advanced
             /// (Optional for images that use the JPXDecode filter, meaningless otherwise; PDF 1.5)
             /// A code specifying how soft-mask information encoded with image samples should be used:
             /// 0 If present, encoded soft-mask image information should be ignored.
-            /// 1 The image’s data stream includes encoded soft-mask values. An application can create
+            /// 1 The imageï¿½s data stream includes encoded soft-mask values. An application can create
             ///   a soft-mask image from the information to be used as a source of mask shape or mask 
             ///   opacity in the transparency imaging model.
-            /// 2 The image’s data stream includes color channels that have been preblended with a 
+            /// 2 The imageï¿½s data stream includes color channels that have been preblended with a 
             ///   background; the image data also includes an opacity channel. An application can create
             ///   a soft-mask image with a Matte entry from the opacity channel information to be used as
             ///   a source of mask shape or mask opacity in the transparency model. If this entry has a 
@@ -843,13 +779,13 @@ namespace PdfSharpCore.Pdf.Advanced
 
             /// <summary>
             /// (Required if the image is a structural content item; PDF 1.3) The integer key of the 
-            /// image’s entry in the structural parent tree.
+            /// imageï¿½s entry in the structural parent tree.
             /// </summary>
             [KeyInfo(KeyType.Integer | KeyType.Required)]
             public const string StructParent = "/StructParent";
 
             /// <summary>
-            /// (Optional; PDF 1.3; indirect reference preferred) The digital identifier of the image’s
+            /// (Optional; PDF 1.3; indirect reference preferred) The digital identifier of the imageï¿½s
             /// parent Web Capture content set.
             /// </summary>
             [KeyInfo(KeyType.String | KeyType.Optional)]

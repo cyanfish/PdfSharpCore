@@ -7,8 +7,9 @@ namespace PdfSharpCore.Drawing
         int Width { get; }
         int Height { get; }
         string Name { get; }
-        bool Transparent { get; }
         void SaveAsJpeg(MemoryStream ms);
+        XImageFormat ImageFormat { get; }
         void SaveAsPdfBitmap(MemoryStream ms);
+        void SaveAsPdfIndexedBitmap(MemoryStream ms);
     }
 }

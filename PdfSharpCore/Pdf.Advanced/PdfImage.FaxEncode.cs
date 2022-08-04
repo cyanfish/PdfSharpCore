@@ -569,22 +569,14 @@ namespace PdfSharpCore.Pdf.Advanced
         /// <returns>The size of the fax encoded image (0 on failure).</returns>
         internal static int DoFaxEncodingGroup4(ref byte[] imageData, byte[] imageBits, uint bytesFileOffset, uint width, uint height)
         {
-            try
+            uint bytesPerLineBmp = (width + 7) / 8;
+            BitWriter writer = new BitWriter(ref imageData);
+            for (uint y = 0; y < height; ++y)
             {
-                uint bytesPerLineBmp = ((width + 31) / 32) * 4;
-                BitWriter writer = new BitWriter(ref imageData);
-                for (uint y = 0; y < height; ++y)
-                {
-                    FaxEncode2DRow(writer, bytesFileOffset, imageBits, y, (y != 0) ? y - 1 : 0xffffffff, width, height, bytesPerLineBmp);
-                }
-                writer.FlushBuffer();
-                return writer.BytesWritten();
+                FaxEncode2DRow(writer, bytesFileOffset, imageBits, y, (y != 0) ? y - 1 : 0xffffffff, width, height, bytesPerLineBmp);
             }
-            catch (Exception ex)
-            {
-                ex.GetType();
-                return 0;
-            }
+            writer.FlushBuffer();
+            return writer.BytesWritten();
         }
 
         /// <summary>

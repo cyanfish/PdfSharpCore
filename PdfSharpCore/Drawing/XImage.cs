@@ -79,14 +79,12 @@ namespace PdfSharpCore.Drawing
         {
             if (ImageSource.ImageSourceImpl == null) ImageSource.ImageSourceImpl = new ImageSharpImageSource<Rgba32>();
             _source = ImageSource.FromFile(path);
-            Initialize();
         }
 
         XImage(IImageSource imageSource)
         {
             _source = imageSource;
             _path = _source.Name;
-            Initialize();
         }
 
         XImage(Func<Stream> stream)
@@ -96,7 +94,6 @@ namespace PdfSharpCore.Drawing
             if (ImageSource.ImageSourceImpl == null) 
                 ImageSource.ImageSourceImpl = new ImageSharpImageSource<Rgba32>();
             _source = ImageSource.FromStream(_path, stream);
-            Initialize();
         }
 
         XImage(Func<byte[]> data)
@@ -104,7 +101,6 @@ namespace PdfSharpCore.Drawing
             // Create a dummy unique path.
             _path = "*" + Guid.NewGuid().ToString("B");
             _source = ImageSource.FromBinary(_path, data);
-            Initialize();
         }
 
         /// <summary>
@@ -177,15 +173,6 @@ namespace PdfSharpCore.Drawing
         }
         XImageState _xImageState;
 
-        internal void Initialize()
-        {
-            if (_source != null)
-            {
-                //We always get a jpeg from an image source
-                _format = _source.Transparent ? XImageFormat.Png : XImageFormat.Jpeg;
-            }
-        }
-
         public MemoryStream AsJpeg()
         {
             var ms = new MemoryStream();
@@ -198,6 +185,14 @@ namespace PdfSharpCore.Drawing
         {
             var ms = new MemoryStream();
             _source.SaveAsPdfBitmap(ms);
+            ms.Position = 0;
+            return ms;
+        }
+
+        public MemoryStream AsIndexedBitmap()
+        {
+            var ms = new MemoryStream();
+            _source.SaveAsPdfIndexedBitmap(ms);
             ms.Position = 0;
             return ms;
         }
@@ -310,9 +305,8 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public XImageFormat Format
         {
-            get { return _format; }
+            get { return _source.ImageFormat; }
         }
-        XImageFormat _format;
 
         internal void AssociateWithGraphics(XGraphics gfx)
         {
