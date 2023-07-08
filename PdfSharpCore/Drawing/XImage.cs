@@ -34,7 +34,6 @@ using PdfSharpCore.Pdf.IO;
 using PdfSharpCore.Pdf.Advanced;
 using PdfSharpCore.Pdf.IO.enums;
 using PdfSharpCore.Utils;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace PdfSharpCore.Drawing
 {
@@ -77,7 +76,7 @@ namespace PdfSharpCore.Drawing
         // Useful stuff here: http://stackoverflow.com/questions/350027/setting-wpf-image-source-in-code
         XImage(string path)
         {
-            if (ImageSource.ImageSourceImpl == null) ImageSource.ImageSourceImpl = new ImageSharpImageSource<Rgba32>();
+            if (ImageSource.ImageSourceImpl == null) throw new InvalidOperationException("ImageSource.ImageSourceImpl not set");
             _source = ImageSource.FromFile(path);
         }
 
@@ -91,8 +90,7 @@ namespace PdfSharpCore.Drawing
         {
             // Create a dummy unique path.
             _path = "*" + Guid.NewGuid().ToString("B");
-            if (ImageSource.ImageSourceImpl == null) 
-                ImageSource.ImageSourceImpl = new ImageSharpImageSource<Rgba32>();
+            if (ImageSource.ImageSourceImpl == null) throw new InvalidOperationException("ImageSource.ImageSourceImpl not set");
             _source = ImageSource.FromStream(_path, stream);
         }
 

@@ -5,7 +5,6 @@ using FluentAssertions;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Test.Helpers;
-using PdfSharpCore.Utils;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;

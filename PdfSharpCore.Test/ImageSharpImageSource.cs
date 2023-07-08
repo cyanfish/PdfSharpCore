@@ -1,4 +1,4 @@
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using PdfSharpCore.Drawing;
 using System;
@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.Formats.Bmp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 
-namespace PdfSharpCore.Utils
+namespace PdfSharpCore.Test
 {
     public class ImageSharpImageSource<TPixel> : ImageSource where TPixel : unmanaged, IPixel<TPixel>
     {
