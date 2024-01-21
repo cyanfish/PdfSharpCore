@@ -117,17 +117,6 @@ namespace PdfSharpCore.Fonts
         { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FontResolverInfo" /> struct.
-        /// </summary>
-        /// <param name="faceName">The name that uniquely identifies the fontface.</param>
-        /// <param name="styleSimulations">The style simulation flags.</param>
-        public FontResolverInfo(string faceName, XStyleSimulations styleSimulations)
-            : this(faceName,
-                  (styleSimulations & XStyleSimulations.BoldSimulation) == XStyleSimulations.BoldSimulation,
-                  (styleSimulations & XStyleSimulations.ItalicSimulation) == XStyleSimulations.ItalicSimulation, 0)
-        { }
-
-        /// <summary>
         /// Gets the key for this object.
         /// </summary>
         internal string Key
@@ -167,14 +156,6 @@ namespace PdfSharpCore.Fonts
             get { return _mustSimulateItalic; }
         }
         readonly bool _mustSimulateItalic;
-
-        /// <summary>
-        /// Gets the style simulation flags.
-        /// </summary>
-        public XStyleSimulations StyleSimulations
-        {
-            get { return (_mustSimulateBold ? XStyleSimulations.BoldSimulation : 0) | (_mustSimulateItalic ? XStyleSimulations.ItalicSimulation : 0); }
-        }
 
         /// <summary>
         /// The number of the font in a Truetype font collection file. The number of the first font is 0.
