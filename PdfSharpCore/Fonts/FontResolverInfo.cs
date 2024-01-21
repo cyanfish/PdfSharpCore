@@ -106,8 +106,6 @@ namespace PdfSharpCore.Fonts
         {
             if (String.IsNullOrEmpty(faceName))
                 throw new ArgumentNullException("faceName");
-            if (collectionNumber != 0)
-                throw new NotImplementedException("collectionNumber is not yet implemented and must be 0.");
 
             _faceName = faceName;
             _mustSimulateBold = mustSimulateBold;
