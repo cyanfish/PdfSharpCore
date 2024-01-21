@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using PdfSharpCore.Drawing;
+using PdfSharpCore.Utils;
 
 namespace PdfSharpCore.Internal
 {
@@ -7,7 +8,7 @@ namespace PdfSharpCore.Internal
     {
         public string Name { get; set; }
 
-        public Dictionary<XFontStyle, string> FontFiles = new Dictionary<XFontStyle, string>();
+        public Dictionary<XFontStyle, FontFileInfo> FontFiles = new Dictionary<XFontStyle, FontFileInfo>();
 
         public bool IsStyleAvailable(XFontStyle fontStyle)
         {

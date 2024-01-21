@@ -51,10 +51,11 @@ namespace PdfSharpCore.Drawing
         // Signature of a true type collection font.
         const uint ttcf = 0x66637474;
 
-        XFontSource(byte[] bytes, ulong key)
+        XFontSource(byte[] bytes, int collectionNumber, ulong key)
         {
             _fontName = null;
             _bytes = bytes;
+            _collectionNumber = collectionNumber;
             _key = key;
         }
 
@@ -62,13 +63,13 @@ namespace PdfSharpCore.Drawing
         /// Gets an existing font source or creates a new one.
         /// A new font source is cached in font factory.
         /// </summary>
-        public static XFontSource GetOrCreateFrom(byte[] bytes)
+        public static XFontSource GetOrCreateFrom(byte[] bytes, int collectionNumber)
         {
             ulong key = FontHelper.CalcChecksum(bytes);
             XFontSource fontSource;
             if (!FontFactory.TryGetFontSourceByKey(key, out fontSource))
             {
-                fontSource = new XFontSource(bytes, key);
+                fontSource = new XFontSource(bytes, collectionNumber, key);
                 // Theoretically the font source could be created by a differend thread in the meantime.
                 fontSource = FontFactory.CacheFontSource(fontSource);
             }
@@ -77,7 +78,7 @@ namespace PdfSharpCore.Drawing
 
         public static XFontSource CreateCompiledFont(byte[] bytes)
         {
-            XFontSource fontSource = new XFontSource(bytes, 0);
+            XFontSource fontSource = new XFontSource(bytes, 0, 0);
             return fontSource;
         }
 
@@ -133,6 +134,12 @@ namespace PdfSharpCore.Drawing
             get { return _bytes; }
         }
         readonly byte[] _bytes;
+
+        public int CollectionNumber
+        {
+            get { return _collectionNumber; }
+        }
+        readonly int _collectionNumber;
 
         public override int GetHashCode()
         {

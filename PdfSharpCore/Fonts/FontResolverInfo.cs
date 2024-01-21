@@ -88,6 +88,15 @@ namespace PdfSharpCore.Fonts
         /// Initializes a new instance of the <see cref="FontResolverInfo"/> struct.
         /// </summary>
         /// <param name="faceName">The name that uniquely identifies the fontface.</param>
+        /// <param name="collectionNumber"></param>
+        public FontResolverInfo(string faceName, int collectionNumber) :
+            this(faceName, false, false, collectionNumber)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FontResolverInfo"/> struct.
+        /// </summary>
+        /// <param name="faceName">The name that uniquely identifies the fontface.</param>
         /// <param name="mustSimulateBold">Set to <c>true</c> to simulate bold when rendered. Not implemented and must be false.</param>
         /// <param name="mustSimulateItalic">Set to <c>true</c> to simulate italic when rendered.</param>
         /// <param name="collectionNumber">Index of the font in a true type font collection.
@@ -159,7 +168,6 @@ namespace PdfSharpCore.Fonts
 
         /// <summary>
         /// The number of the font in a Truetype font collection file. The number of the first font is 0.
-        /// NOT YET IMPLEMENTED. Must be zero.
         /// </summary>
         internal int CollectionNumber  // TODO : Find a better name.
         {
