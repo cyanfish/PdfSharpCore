@@ -42,11 +42,6 @@ namespace PdfSharpCore.Fonts.OpenType
         /// <summary>
         /// Font is a TrueType font.
         /// </summary>
-        TrueTypeOutlines,
-
-        /// <summary>
-        /// Font is a TrueType font collection.
-        /// </summary>
-        TrueTypeCollection
+        TrueTypeOutlines
     }
 }
