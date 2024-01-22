@@ -291,29 +291,44 @@ namespace PdfSharpCore.Fonts.OpenType
         {
             try
             {
-                CMap4 cmap4 = FontFace.cmap.cmap4;
-                int segCount = cmap4.segCountX2 / 2;
-                int seg;
-                for (seg = 0; seg < segCount; seg++)
+                if (FontFace.cmap.cmap12 != null)
                 {
-                    if (value <= cmap4.endCount[seg])
-                        break;
+                    CMap12 cmap12 = FontFace.cmap.cmap12;
+                    for (int group = 0; group < cmap12.groupCount; group++)
+                    {
+                        if (value >= cmap12.startCharCodes[group] && value <= cmap12.endCharCodes[group])
+                        {
+                            return (int) (cmap12.startGlyphCodes[group] + value - cmap12.startCharCodes[group]);
+                        }
+                    }
+                    return 0;
                 }
-                Debug.Assert(seg < segCount);
+                else
+                {
+                    CMap4 cmap4 = FontFace.cmap.cmap4;
+                    int segCount = cmap4.segCountX2 / 2;
+                    int seg;
+                    for (seg = 0; seg < segCount; seg++)
+                    {
+                        if (value <= cmap4.endCount[seg])
+                            break;
+                    }
+                    Debug.Assert(seg < segCount);
 
-                if (value < cmap4.startCount[seg])
-                    return 0;
+                    if (value < cmap4.startCount[seg])
+                        return 0;
 
-                if (cmap4.idRangeOffs[seg] == 0)
-                    return (value + cmap4.idDelta[seg]) & 0xFFFF;
+                    if (cmap4.idRangeOffs[seg] == 0)
+                        return (value + cmap4.idDelta[seg]) & 0xFFFF;
 
-                int idx = cmap4.idRangeOffs[seg] / 2 + (value - cmap4.startCount[seg]) - (segCount - seg);
-                Debug.Assert(idx >= 0 && idx < cmap4.glyphCount);
+                    int idx = cmap4.idRangeOffs[seg] / 2 + (value - cmap4.startCount[seg]) - (segCount - seg);
+                    Debug.Assert(idx >= 0 && idx < cmap4.glyphCount);
 
-                if (cmap4.glyphIdArray[idx] == 0)
-                    return 0;
+                    if (cmap4.glyphIdArray[idx] == 0)
+                        return 0;
 
-                return (cmap4.glyphIdArray[idx] + cmap4.idDelta[seg]) & 0xFFFF;
+                    return (cmap4.glyphIdArray[idx] + cmap4.idDelta[seg]) & 0xFFFF;
+                }
             }
             catch
             {
