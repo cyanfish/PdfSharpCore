@@ -35,13 +35,13 @@ namespace PdfSharpCore.Fonts.OpenType
     enum FontTechnology
     {
         /// <summary>
-        /// Font is Adobe Postscript font in CFF.
-        /// </summary>
-        PostscriptOutlines,
-
-        /// <summary>
         /// Font is a TrueType font.
         /// </summary>
-        TrueTypeOutlines
+        TrueTypeOutlines,
+        
+        /// <summary>
+        /// Font is an OpenType font with Compact Font Format (CFF) data.
+        /// </summary>
+        CffOutlines
     }
 }
