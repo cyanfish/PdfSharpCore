@@ -18,6 +18,8 @@ namespace PdfSharpCore.Utils
 
         public static readonly Dictionary<string, FontFamilyModel> InstalledFonts = new Dictionary<string, FontFamilyModel>();
 
+        internal static readonly string[] SupportedExtensions = { ".ttf", ".ttc", ".otf", ".otc" };
+
         private static readonly string[] SSupportedFonts;
 
         public FontResolver()
@@ -61,8 +63,10 @@ namespace PdfSharpCore.Utils
             {
                 if (Directory.Exists(fontDir))
                 {
-                    fontPaths.AddRange(Directory.GetFiles(fontDir, "*.ttc", SearchOption.AllDirectories));
-                    fontPaths.AddRange(Directory.GetFiles(fontDir, "*.ttf", SearchOption.AllDirectories));
+                    foreach (var ext in SupportedExtensions)
+                    {
+                        fontPaths.AddRange(Directory.GetFiles(fontDir, $"*{ext}", SearchOption.AllDirectories));
+                    }
                 }
             }
             SSupportedFonts = fontPaths.ToArray();

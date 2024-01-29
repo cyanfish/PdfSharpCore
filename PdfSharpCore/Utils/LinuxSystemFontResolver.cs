@@ -132,12 +132,12 @@ namespace PdfSharpCore.Utils
         {
             try
             {
-                return ResolveFontConfig().Where(x => x.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase) || x.EndsWith(".ttc", StringComparison.OrdinalIgnoreCase)).ToArray();
+                return ResolveFontConfig().Where(x => FontResolver.SupportedExtensions.Any(ext => x.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).ToArray();
             }
             catch(Exception ex)
             {
                 Console.Error.WriteLine(ex.ToString());
-                return ResolveFallback().Where(x => x.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase) || x.EndsWith(".ttc", StringComparison.OrdinalIgnoreCase)).ToArray();
+                return ResolveFallback().Where(x => FontResolver.SupportedExtensions.Any(ext => x.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).ToArray();
             }
         }
 
