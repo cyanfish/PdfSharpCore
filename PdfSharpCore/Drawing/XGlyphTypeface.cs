@@ -100,7 +100,7 @@ namespace PdfSharpCore.Drawing
 
             // We have a valid font resolver info. That means we also have an XFontSource object loaded in the cache.
             ////XFontSource fontSource = FontFactory.GetFontSourceByTypefaceKey(fontResolverInfo.FaceName);
-            XFontSource fontSource = FontFactory.GetFontSourceByFontName(fontResolverInfo.FaceName);
+            XFontSource fontSource = FontFactory.GetFontSourceByFontName(fontResolverInfo.FaceNameAndCollectionIndex);
             Debug.Assert(fontSource != null);
 
             // Each font source already contains its OpenTypeFontface.

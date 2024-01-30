@@ -46,16 +46,12 @@ namespace PdfSharpCore.Drawing
         // * XFontSource represents a single font (file) in memory.
         // * An XFontSource hold a reference to it OpenTypeFontface.
         // * To prevent large heap fragmentation this class must exists only once.
-        // * TODO: ttcf
 
-        // Signature of a true type collection font.
-        const uint ttcf = 0x66637474;
-
-        XFontSource(byte[] bytes, int collectionNumber, ulong key)
+        XFontSource(byte[] bytes, int collectionIndex, ulong key)
         {
-            _fontName = null;
-            _bytes = bytes;
-            _collectionNumber = collectionNumber;
+            FontName = null;
+            Bytes = bytes;
+            CollectionIndex = collectionIndex;
             _key = key;
         }
 
@@ -91,7 +87,7 @@ namespace PdfSharpCore.Drawing
             set
             {
                 _fontface = value;
-                _fontName = value.name.FullFontName;
+                FontName = value.name.FullFontName;
             }
         }
         OpenTypeFontface _fontface;
@@ -120,26 +116,14 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets the name of the font's name table.
         /// </summary>
-        public string FontName
-        {
-            get { return _fontName; }
-        }
-        string _fontName;
+        public string FontName { get; private set; }
 
         /// <summary>
         /// Gets the bytes of the font.
         /// </summary>
-        public byte[] Bytes
-        {
-            get { return _bytes; }
-        }
-        readonly byte[] _bytes;
+        public byte[] Bytes { get; }
 
-        public int CollectionNumber
-        {
-            get { return _collectionNumber; }
-        }
-        readonly int _collectionNumber;
+        public int CollectionIndex { get; }
 
         public override int GetHashCode()
         {

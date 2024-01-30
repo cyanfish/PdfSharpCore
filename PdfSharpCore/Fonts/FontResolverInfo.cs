@@ -88,9 +88,9 @@ namespace PdfSharpCore.Fonts
         /// Initializes a new instance of the <see cref="FontResolverInfo"/> struct.
         /// </summary>
         /// <param name="faceName">The name that uniquely identifies the fontface.</param>
-        /// <param name="collectionNumber"></param>
-        public FontResolverInfo(string faceName, int collectionNumber) :
-            this(faceName, false, false, collectionNumber)
+        /// <param name="collectionIndex"></param>
+        public FontResolverInfo(string faceName, int collectionIndex) :
+            this(faceName, false, false, collectionIndex)
         { }
 
         /// <summary>
@@ -99,18 +99,18 @@ namespace PdfSharpCore.Fonts
         /// <param name="faceName">The name that uniquely identifies the fontface.</param>
         /// <param name="mustSimulateBold">Set to <c>true</c> to simulate bold when rendered. Not implemented and must be false.</param>
         /// <param name="mustSimulateItalic">Set to <c>true</c> to simulate italic when rendered.</param>
-        /// <param name="collectionNumber">Index of the font in a true type font collection.
+        /// <param name="collectionIndex">Index of the font in a true type font collection.
         /// Not yet implemented and must be zero.
         /// </param>
-        internal FontResolverInfo(string faceName, bool mustSimulateBold, bool mustSimulateItalic, int collectionNumber)
+        internal FontResolverInfo(string faceName, bool mustSimulateBold, bool mustSimulateItalic, int collectionIndex)
         {
             if (String.IsNullOrEmpty(faceName))
                 throw new ArgumentNullException("faceName");
 
-            _faceName = faceName;
-            _mustSimulateBold = mustSimulateBold;
-            _mustSimulateItalic = mustSimulateItalic;
-            _collectionNumber = collectionNumber;
+            FaceName = faceName;
+            MustSimulateBold = mustSimulateBold;
+            MustSimulateItalic = mustSimulateItalic;
+            CollectionIndex = collectionIndex;
         }
 
         /// <summary>
@@ -130,8 +130,9 @@ namespace PdfSharpCore.Fonts
         {
             get
             {
-                return _key ?? (_key = KeyPrefix + _faceName.ToLowerInvariant()
-                                       + '/' + (_mustSimulateBold ? "b+" : "b-") + (_mustSimulateItalic ? "i+" : "i-"));
+                return _key ?? (_key = KeyPrefix + FaceName.ToLowerInvariant()
+                                       + '/' + (MustSimulateBold ? "b+" : "b-") + (MustSimulateItalic ? "i+" : "i-")
+                                       + "/" + CollectionIndex);
             }
         }
         string _key;
@@ -140,38 +141,24 @@ namespace PdfSharpCore.Fonts
         /// A name that uniquely identifies the font (not the family), e.g. the file name of the font. PDFsharp does not use this
         /// name internally, but passes it to the GetFont function of the IFontResolver interface to retrieve the font data.
         /// </summary>
-        public string FaceName
-        {
-            get { return _faceName; }
-        }
-        readonly string _faceName;
+        public string FaceName { get; }
 
         /// <summary>
         /// Indicates whether bold must be simulated. Bold simulation is not implemented in PdfSharpCore.
         /// </summary>
-        public bool MustSimulateBold
-        {
-            get { return _mustSimulateBold; }
-        }
-        readonly bool _mustSimulateBold;
+        public bool MustSimulateBold { get; }
 
         /// <summary>
         /// Indicates whether italic must be simulated.
         /// </summary>
-        public bool MustSimulateItalic
-        {
-            get { return _mustSimulateItalic; }
-        }
-        readonly bool _mustSimulateItalic;
+        public bool MustSimulateItalic { get; }
 
         /// <summary>
         /// The number of the font in a Truetype font collection file. The number of the first font is 0.
         /// </summary>
-        internal int CollectionNumber  // TODO : Find a better name.
-        {
-            get { return _collectionNumber; }
-        }
-        readonly int _collectionNumber;
+        public int CollectionIndex { get; }
+
+        public string FaceNameAndCollectionIndex => $"{FaceName}[{CollectionIndex}]";
 
         /// <summary>
         /// Gets the DebuggerDisplayAttribute text.

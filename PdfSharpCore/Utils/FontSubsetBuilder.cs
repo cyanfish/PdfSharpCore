@@ -13,7 +13,7 @@ namespace PdfSharpCore.Utils
         {
             var fontResolverInfo =
                 FontFactory.ResolveTypeface(familyName, new FontResolvingOptions(XFontStyle.Regular), null);
-            _fontSource = FontFactory.GetFontSourceByFontName(fontResolverInfo.FaceName);
+            _fontSource = FontFactory.GetFontSourceByFontName(fontResolverInfo.FaceNameAndCollectionIndex);
             _cMapInfo = new CMapInfo(new OpenTypeDescriptor("", "", XFontStyle.Regular, _fontSource.Fontface,
                 XPdfFontOptions.UnicodeDefault));
         }

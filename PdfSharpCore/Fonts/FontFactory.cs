@@ -107,7 +107,7 @@ namespace PdfSharpCore.Fonts
 
                             // Create font source if not yet exists.
                             XFontSource previousFontSource;
-                            if (FontSourcesByName.TryGetValue(fontResolverInfo.FaceName, out previousFontSource))
+                            if (FontSourcesByName.TryGetValue(fontResolverInfo.FaceNameAndCollectionIndex, out previousFontSource))
                             {
                                 // Case: The font source exists, because a previous font resolver info comes
                                 // with the same face name, but was different in style simulation flags.
@@ -117,11 +117,11 @@ namespace PdfSharpCore.Fonts
                             {
                                 // Case: Get font from custom font resolver and create font source.
                                 byte[] bytes = customFontResolver.GetFont(fontResolverInfo.FaceName);
-                                XFontSource fontSource = XFontSource.GetOrCreateFrom(bytes, fontResolverInfo.CollectionNumber);
+                                XFontSource fontSource = XFontSource.GetOrCreateFrom(bytes, fontResolverInfo.CollectionIndex);
 
                                 // Add font source's font resolver name if it is different to the face name.
                                 if (string.Compare(fontResolverInfo.FaceName, fontSource.FontName, StringComparison.OrdinalIgnoreCase) != 0)
-                                    FontSourcesByName.Add(fontResolverInfo.FaceName, fontSource);
+                                    FontSourcesByName.Add(fontResolverInfo.FaceNameAndCollectionIndex, fontSource);
                             }
                         }
                     }
