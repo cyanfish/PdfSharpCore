@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;netstandard2.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0;net6.0</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Authors>Stefan Steiger and Contributors</Authors>
-    <Description>PdfSharp for .NET Core
-
-PdfSharpCore is a partial port of PdfSharp.Xamarin for .NET Core Additionally MigraDoc has been ported as well (from version 1.32). Images have been implemented with ImageSharp from https://www.nuget.org/packages/SixLabors.ImageSharp</Description>
-    <Copyright>Copyright (c) 2005-2007 empira Software GmbH, Cologne (Germany)</Copyright>
+    <Authors>Ben Olden-Cooligan</Authors>
+    <Company>NAPS2 Software</Company>
+    <Description>Fork of PdfSharpCore for NAPS2.Sdk</Description>
     <PackageLicenseFile>LICENCE.md</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/ststeiger/PdfSharpCore</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ststeiger/PdfSharpCore</RepositoryUrl>
-    <PackageReleaseNotes>PdfSharpCore is a partial port of PdfSharp.Xamarin for .NET Core Additionally MigraDoc has been ported as well (from version 1.32)</PackageReleaseNotes>
-    <PackageTags>NuggetV1.0.0 (8ea343d5898342a563b9d4df2d67e27aaea9ac01)</PackageTags>
-    <summary>PdfSharp for .NET Core</summary>    
+    <PackageProjectUrl>https://github.com/cyanfish/naps2-pdfsharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/cyanfish/naps2-pdfsharp</RepositoryUrl>
+    <PackageId>NAPS2.PdfSharp</PackageId>
+    <Title>NAPS2.PdfSharp</Title>
+    <Product>NAPS2.PdfSharp</Product>
+    <PackageTags>naps2 pdfsharp</PackageTags>
+    <PackageVersion>1.0.1</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
